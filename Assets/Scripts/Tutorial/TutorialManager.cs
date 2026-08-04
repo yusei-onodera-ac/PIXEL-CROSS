@@ -39,7 +39,7 @@ namespace PixelCross.Tutorial
         public void GrantCompletionReward(TeamData team)
         {
             team.GachaTickets += CompletionRewardGachaTickets;
-            team.GachaCurrency += CompletionRewardCurrency;
+            team.BasicCurrency += CompletionRewardCurrency;
         }
     }
 }

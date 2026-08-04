@@ -1,12 +1,15 @@
 using System;
 using System.Collections.Generic;
+using PixelCross.Data;
 
 namespace PixelCross.Gacha
 {
     public static class GachaSystem
     {
-        public const int SinglePullCost = 100;
-        public const int TenPullCost = 900;
+        public const int SinglePullTicketCost = 1;
+        public const int TenPullTicketCost = 10;
+        public const int SinglePullPremiumCost = 50;
+        public const int TenPullPremiumCost = 450;
 
         private static readonly (ItemRarity Rarity, float Weight)[] RarityTable =
         {
@@ -16,7 +19,59 @@ namespace PixelCross.Gacha
             (ItemRarity.Legendary, 0.02f)
         };
 
-        public static GachaItem PullSingle(Random rng)
+        public static bool TryPullSingleWithTicket(TeamData team, Random rng, out GachaItem item)
+        {
+            if (team.GachaTickets < SinglePullTicketCost)
+            {
+                item = default;
+                return false;
+            }
+
+            team.GachaTickets -= SinglePullTicketCost;
+            item = PullSingle(rng);
+            return true;
+        }
+
+        public static bool TryPullTenWithTicket(TeamData team, Random rng, out List<GachaItem> items)
+        {
+            if (team.GachaTickets < TenPullTicketCost)
+            {
+                items = null;
+                return false;
+            }
+
+            team.GachaTickets -= TenPullTicketCost;
+            items = PullTen(rng);
+            return true;
+        }
+
+        public static bool TryPullSingleWithPremiumCurrency(TeamData team, Random rng, out GachaItem item)
+        {
+            if (team.PremiumCurrency < SinglePullPremiumCost)
+            {
+                item = default;
+                return false;
+            }
+
+            team.PremiumCurrency -= SinglePullPremiumCost;
+            item = PullSingle(rng);
+            return true;
+        }
+
+        public static bool TryPullTenWithPremiumCurrency(TeamData team, Random rng, out List<GachaItem> items)
+        {
+            if (team.PremiumCurrency < TenPullPremiumCost)
+            {
+                items = null;
+                return false;
+            }
+
+            team.PremiumCurrency -= TenPullPremiumCost;
+            items = PullTen(rng);
+            return true;
+        }
+
+        private static GachaItem PullSingle(Random rng)
         {
             var roll = rng.NextDouble();
             var cumulative = 0f;
@@ -35,7 +90,7 @@ namespace PixelCross.Gacha
             return BuildItem(rarity, rng);
         }
 
-        public static List<GachaItem> PullTen(Random rng)
+        private static List<GachaItem> PullTen(Random rng)
         {
             var results = new List<GachaItem>(10);
             for (var i = 0; i < 10; i++)

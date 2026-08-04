@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace PixelCross.Core
 {
@@ -41,6 +43,34 @@ namespace PixelCross.Core
                 8 => SeasonPhase.Intercollegiate,
                 _ => SeasonPhase.OffSeason
             };
+        }
+
+        public static (int StartWeek, int EndWeek) GetWeekRangeForMonth(int month)
+        {
+            var start = (month - 1) * WeeksPerMonth + 1;
+            return (start, start + WeeksPerMonth - 1);
+        }
+
+        public static IReadOnlyList<int> GetWeeksInYearForPhase(SeasonPhase phase)
+        {
+            var weeks = new List<int>();
+            for (var month = 1; month <= MonthsPerYear; month++)
+            {
+                if (GetPhaseForMonth(month) != phase) continue;
+                var (start, end) = GetWeekRangeForMonth(month);
+                weeks.AddRange(Enumerable.Range(start, end - start + 1));
+            }
+            return weeks;
+        }
+
+        // Restores year/week without firing week/phase events, for use when
+        // reconstructing state from a save file (event-driven side effects
+        // like freshmen intake must not replay during a load).
+        public void LoadState(int year, int week)
+        {
+            CurrentYear = year;
+            CurrentWeek = week;
+            _previousPhase = CurrentPhase;
         }
 
         public void AdvanceWeek()

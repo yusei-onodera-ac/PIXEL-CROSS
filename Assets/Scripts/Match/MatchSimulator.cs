@@ -7,16 +7,17 @@ namespace PixelCross.Match
     // simulation (per the design doc's in-match visuals) replaces this later.
     public static class MatchSimulator
     {
-        public static MatchResult SimulateAgainstRival(TeamData home, RivalSchoolData away, Random rng)
-        {
-            var homeStrength = home.TeamStrength * TacticsMultiplier(home.Tactics);
-            var awayStrength = away.Strength;
+        public static MatchResult SimulateAgainstRival(TeamData home, RivalSchoolData away, Random rng) =>
+            SimulateByStrength(GetEffectiveStrength(home), away.Strength, rng);
 
+        public static MatchResult SimulateByStrength(float homeStrength, float awayStrength, Random rng)
+        {
             var homeScore = ScoreFromStrength(homeStrength, rng);
             var awayScore = ScoreFromStrength(awayStrength, rng);
-
             return new MatchResult { HomeScore = homeScore, AwayScore = awayScore };
         }
+
+        public static float GetEffectiveStrength(TeamData team) => team.TeamStrength * TacticsMultiplier(team.Tactics);
 
         private static float TacticsMultiplier(TacticsSettings tactics)
         {

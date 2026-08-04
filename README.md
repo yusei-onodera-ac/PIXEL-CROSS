@@ -21,7 +21,9 @@ Assets/
     Data/         PlayerData, PlayerStats, TeamData, RivalSchoolData 等のデータモデル
     Training/     練習メニューとステータス成長ロジック
     Scouting/     高校生スカウト（夏季解禁・年2枚チケット）
-    Gacha/        ガチャ抽選・アイテム
+    Gacha/        ガチャ抽選・アイテム（ガチャチケット/上位硬貨消費）
+    Economy/      2層通貨（基本硬貨/上位硬貨）の交換・連続ログインボーナス
+    Facility/     施設強化（骨組みのみ・効果未接続）
     Match/        試合結果シミュレーション（暫定ロジック）
     Tutorial/     初回チュートリアルのステップ管理
     Localization/ 多言語対応（日本語/英語/フランス語）
@@ -36,15 +38,20 @@ docs/             企画書・設計資料
 company/logs/     社内AI組織の作業ログ
 ```
 
-## 実装状況（雛形段階）
+## 実装状況
 - [x] コアループの骨組み：週単位ターン進行（1年=48週）、シーズンフェーズ自動判定
 - [x] データモデル：選手5能力値、チーム、ライバル校20校（強豪5校含む）、作戦・戦術
 - [x] 各システムのスケルトン：練習/スタミナ、スカウト、ガチャ、試合の簡易計算、チュートリアル進行、セーブ/ロード
+- [x] 週次ループ統合（[GameManager.cs](Assets/Scripts/Core/GameManager.cs)）：新入部員自動生成・学年進級、4年生引退＋プロスカウト判定、リーグ戦日程抽選（[LeagueScheduleGenerator.cs](Assets/Scripts/Match/LeagueScheduleGenerator.cs)）、インカレ8校トーナメント（[IntercollegiateSystem.cs](Assets/Scripts/Match/IntercollegiateSystem.cs)）、セーブ/ロード時の日程復元
+- [x] 2層通貨・ログインボーナス：基本硬貨/上位硬貨（[TeamData.cs](Assets/Scripts/Data/TeamData.cs)）、上位硬貨→基本硬貨の交換（[CurrencyExchangeSystem.cs](Assets/Scripts/Economy/CurrencyExchangeSystem.cs)）、連続ログイン日数に応じた上位硬貨付与（[LoginBonusSystem.cs](Assets/Scripts/Economy/LoginBonusSystem.cs)）、ガチャチケット/上位硬貨の2way課金（[GachaSystem.cs](Assets/Scripts/Gacha/GachaSystem.cs)）
 - [ ] Unityシーン・UI（未着手。上記スクリプトを呼び出す画面が必要）
 - [ ] ドット絵アセット（プレースホルダー無し）
 - [ ] 試合のトップダウン・アクション表現（現状は数値ベースの簡易シミュレーションのみ）
-- [ ] 課金（IAP）実装
+- [ ] 課金（IAP）実装本体（上位硬貨の購入導線）
+- [ ] 施設強化（[FacilitySystem.cs](Assets/Scripts/Facility/FacilitySystem.cs)）：レベル/コストの骨組みのみで、効果（練習効率・スタミナ回復等への影響）は未設計
 - [ ] 非同期フレンド対戦（OB防衛チーム）のネットワーク部分
+- [ ] 評価バランス（勝敗による知名度/ランキング変動値、通貨獲得量・交換レート・ガチャ価格は全て仮の数値。要調整）
 
 ## 注意
-本フォルダは空のGitHubリポジトリ (`https://github.com/yusei-onodera-ac/PIXEL-CROSS.git`) に対応する雛形です。まだリモートへはpushしていません。
+- 本フォルダは空のGitHubリポジトリ (`https://github.com/yusei-onodera-ac/PIXEL-CROSS.git`) に対応する雛形です。
+- ロジック層（Unity Editor不要な部分）を優先実装中。Unity Editorでのシーン/UI作成は別途対応が必要です。

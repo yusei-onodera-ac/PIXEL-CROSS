@@ -15,10 +15,17 @@ namespace PixelCross.Data
         public List<PlayerData> Roster = new List<PlayerData>();
         public List<PlayerData> HallOfFame = new List<PlayerData>();
         public TacticsSettings Tactics = new TacticsSettings();
+        public FacilityLevels Facilities = new FacilityLevels();
 
         public int ScoutTickets;
         public int GachaTickets;
-        public int GachaCurrency;
+
+        // Two-tier currency: BasicCurrency is earned in-game (match wins,
+        // events) and spent on the item shop / facility upgrades.
+        // PremiumCurrency comes from IAP or the daily login bonus, and can
+        // buy gacha pulls or be exchanged for BasicCurrency (never the reverse).
+        public int BasicCurrency;
+        public int PremiumCurrency;
 
         public TeamData()
         {
