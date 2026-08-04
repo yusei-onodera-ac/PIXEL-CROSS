@@ -23,7 +23,7 @@ namespace PixelCross.Core
         public TeamData PlayerTeam { get; private set; }
         public List<RivalSchoolData> RivalSchools { get; private set; } = new List<RivalSchoolData>();
         public List<ScheduledMatch> CurrentYearSchedule { get; private set; } = new List<ScheduledMatch>();
-        public TutorialStep TutorialProgress { get; set; } = TutorialStep.NotStarted;
+        public TutorialManager Tutorial { get; private set; } = new TutorialManager();
 
         private readonly Random _rng = new Random();
         private DateTime _lastLoginDateUtc = DateTime.MinValue;
@@ -62,7 +62,7 @@ namespace PixelCross.Core
             BindTurnEvents();
             GenerateSeasonSchedule();
 
-            TutorialProgress = TutorialStep.NotStarted;
+            Tutorial = new TutorialManager();
             _lastLoginDateUtc = DateTime.MinValue;
             _consecutiveLoginDays = 0;
         }
@@ -182,6 +182,9 @@ namespace PixelCross.Core
         public bool UseInventoryItem(PlayerData player, int inventoryIndex) =>
             InventorySystem.UseItem(PlayerTeam, player, inventoryIndex);
 
+        public bool TryPurchaseShopItem(int catalogIndex, out Item purchasedItem) =>
+            ItemShopSystem.TryPurchase(PlayerTeam, catalogIndex, out purchasedItem);
+
         public void SaveGame(string slot = "default")
         {
             var data = new GameSaveData
@@ -191,7 +194,7 @@ namespace PixelCross.Core
                 PlayerTeam = PlayerTeam,
                 RivalSchools = RivalSchools,
                 CurrentYearSchedule = CurrentYearSchedule,
-                TutorialProgress = TutorialProgress,
+                TutorialProgress = Tutorial.CurrentStep,
                 LastLoginDateUtc = _lastLoginDateUtc.ToString("o"),
                 ConsecutiveLoginDays = _consecutiveLoginDays
             };
@@ -205,7 +208,8 @@ namespace PixelCross.Core
             PlayerTeam = data.PlayerTeam;
             RivalSchools = data.RivalSchools;
             CurrentYearSchedule = data.CurrentYearSchedule ?? new List<ScheduledMatch>();
-            TutorialProgress = data.TutorialProgress;
+            Tutorial = new TutorialManager();
+            Tutorial.LoadState(data.TutorialProgress);
             _lastLoginDateUtc = DateTime.TryParse(
                 data.LastLoginDateUtc, null,
                 System.Globalization.DateTimeStyles.RoundtripKind, out var parsed)

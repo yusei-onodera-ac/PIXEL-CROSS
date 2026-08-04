@@ -48,11 +48,13 @@ company/logs/     社内AI組織の作業ログ
 - [x] 2層通貨・ログインボーナス：基本硬貨/上位硬貨（[TeamData.cs](Assets/Scripts/Data/TeamData.cs)）、上位硬貨→基本硬貨の交換（[CurrencyExchangeSystem.cs](Assets/Scripts/Economy/CurrencyExchangeSystem.cs)）、連続ログイン日数に応じた上位硬貨付与（[LoginBonusSystem.cs](Assets/Scripts/Economy/LoginBonusSystem.cs)）、ガチャチケット/上位硬貨の2way課金（[GachaSystem.cs](Assets/Scripts/Gacha/GachaSystem.cs)）
 - [x] インベントリ：ガチャ/ショップ入手アイテムの保管・使用（[InventorySystem.cs](Assets/Scripts/Inventory/InventorySystem.cs)）。アイテム種別ごとの効果先（SkillBook→テクニック、TrainingGear→ボディ等）は暫定割り当て
 - [x] 起動ロゴ・タイトル画面のコントローラー：[SplashScreenController.cs](Assets/Scripts/UI/SplashScreenController.cs)（白背景フェードイン→ホールド→フェードアウト、タップでスキップ）、[TitleScreenController.cs](Assets/Scripts/UI/TitleScreenController.cs)（はじめから/つづきから/設定、セーブ有無でつづきからボタンの活性切替）。**スクリプトのみで、実際のUnityシーン(.unity)は未作成**（後述の手順を参照）
-- [ ] Unityシーン本体（Boot/Title含め未作成。上記コントローラーをアタッチする画面が必要）
+- [x] チーム結成画面コントローラー：[TeamSetupController.cs](Assets/Scripts/UI/TeamSetupController.cs)（大学名/監督名入力→`StartNewGame`→チュートリアル進行→Gameplayシーンへ。こちらもスクリプトのみで.unity未作成）
+- [x] アイテムショップ：[ItemShopSystem.cs](Assets/Scripts/Inventory/ItemShopSystem.cs)（固定カタログ3種を基本硬貨で購入、インベントリに自動格納）。価格は仮の数値
+- [x] TutorialManagerの統合：GameManagerが生の`TutorialStep`ではなく`TutorialManager`本体を保持するよう修正（イベント発火のロジックが死んでいた不整合を解消）
+- [ ] Unityシーン本体（Boot/Title/TeamSetup含め未作成。上記コントローラーをアタッチする画面が必要）
 - [ ] ドット絵アセット（プレースホルダー無し）
 - [ ] 試合のトップダウン・アクション表現（現状は数値ベースの簡易シミュレーションのみ）
 - [ ] 課金（IAP）実装本体（上位硬貨の購入導線）
-- [ ] アイテムショップ本体（基本硬貨でのアイテム購入カタログ・価格は未設計。現状はガチャ経由の入手のみ）
 - [ ] 施設強化（[FacilitySystem.cs](Assets/Scripts/Facility/FacilitySystem.cs)）：レベル/コストの骨組みのみで、効果（練習効率・スタミナ回復等への影響）は未設計
 - [ ] 非同期フレンド対戦（OB防衛チーム）のネットワーク部分
 - [ ] 評価バランス（勝敗による知名度/ランキング変動値、通貨獲得量・交換レート・ガチャ価格は全て仮の数値。要調整）
@@ -69,10 +71,14 @@ company/logs/     社内AI組織の作業ログ
 3. **Title.unity**:
    - Canvasを作成し、ゲームタイトルロゴ/テキストを配置。
    - Button×3（はじめから／つづきから／設定）を配置し、空のGameObjectに[TitleScreenController.cs](Assets/Scripts/UI/TitleScreenController.cs)をアタッチして、Inspectorで3つのButtonを割り当てる。
-4. File > Build Settings > Scenes In Build に `Boot`（index 0）→ `Title` の順で追加。
-5. `SplashScreenController`のInspectorで遷移先シーン名（デフォルト`Title`）とフェード秒数を確認・調整。
+4. **TeamSetup.unity**（「はじめから」の遷移先）:
+   - TMP_InputField×2（大学名／監督名）とButton（決定）を配置。
+   - 空のGameObjectに[TeamSetupController.cs](Assets/Scripts/UI/TeamSetupController.cs)をアタッチし、Inspectorで2つのInputFieldとButtonを割り当てる。
+   - 両方に文字が入るまで決定ボタンは自動的に非活性になります。
+5. File > Build Settings > Scenes In Build に `Boot`（index 0）→ `Title` → `TeamSetup` の順で追加。
+6. `SplashScreenController`のInspectorで遷移先シーン名（デフォルト`Title`）とフェード秒数を確認・調整。
 
-※「はじめから」「設定」の遷移先（`TeamSetup`/`Settings`シーン）はまだ存在しません。押しても何も起きないので、それぞれのシーンを作るまでは想定内の挙動です。
+※「設定」の遷移先（`Settings`シーン）と、決定後の遷移先`Gameplay`シーンはまだ存在しません。それぞれのシーンを作るまでは押しても何も起きない/エラーになるので想定内です。
 
 ## 注意
 - 本フォルダは空のGitHubリポジトリ (`https://github.com/yusei-onodera-ac/PIXEL-CROSS.git`) に対応する雛形です。

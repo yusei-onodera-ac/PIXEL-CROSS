@@ -13,6 +13,13 @@ namespace PixelCross.Tutorial
         public event Action<TutorialStep> OnStepChanged;
         public event Action OnTutorialCompleted;
 
+        // Restores step without firing events, for use when reconstructing
+        // state from a save file.
+        public void LoadState(TutorialStep step)
+        {
+            CurrentStep = step;
+        }
+
         public void AdvanceStep()
         {
             if (CurrentStep == TutorialStep.Completed) return;
