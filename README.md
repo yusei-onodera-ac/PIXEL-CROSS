@@ -3,7 +3,7 @@
 大学ラクロス育成・経営シミュレーション。企画書は [docs/GameDesignDocument.md](docs/GameDesignDocument.md) を参照。
 
 ## 技術スタック
-- Unity **2022.3 LTS** (`2022.3.50f1` を想定。[ProjectSettings/ProjectVersion.txt](ProjectSettings/ProjectVersion.txt) で変更可能)
+- Unity **6000.5.6f1**（開発機にインストール済みのバージョンに合わせて設定。[ProjectSettings/ProjectVersion.txt](ProjectSettings/ProjectVersion.txt) で変更可能）
 - C#
 - ビルドターゲット：iOS優先、Android/PC等クロスプラットフォーム対応
 - 主要パッケージ（[Packages/manifest.json](Packages/manifest.json)）：2D Sprite / 2D Pixel Perfect / 2D Animation / TextMeshPro / Unity Localization / Input System
