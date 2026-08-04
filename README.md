@@ -27,7 +27,7 @@ Assets/
     Inventory/    所持アイテムの保管・使用（ガチャ/ショップ入手品）
     Match/        試合結果シミュレーション（暫定ロジック）
     Tutorial/     初回チュートリアルのステップ管理
-    Localization/ 多言語対応（日本語/英語/フランス語）
+    Localization/ 多言語対応（日/英/仏/西/独/チェコ/ヘブライ/繁体中国語/フィリピノ）
     SaveLoad/     セーブデータ定義とJSON保存/読込
     UI/           起動ロゴ(Splash)・タイトル画面のコントローラー
   Scenes/         Unityシーン（未作成・要追加。下記「Boot/Titleシーンの作成手順」参照）
@@ -51,6 +51,7 @@ company/logs/     社内AI組織の作業ログ
 - [x] チーム結成画面コントローラー：[TeamSetupController.cs](Assets/Scripts/UI/TeamSetupController.cs)（大学名/監督名入力→`StartNewGame`→チュートリアル進行→Gameplayシーンへ。こちらもスクリプトのみで.unity未作成）
 - [x] アイテムショップ：[ItemShopSystem.cs](Assets/Scripts/Inventory/ItemShopSystem.cs)（固定カタログ3種を基本硬貨で購入、インベントリに自動格納）。価格は仮の数値
 - [x] TutorialManagerの統合：GameManagerが生の`TutorialStep`ではなく`TutorialManager`本体を保持するよう修正（イベント発火のロジックが死んでいた不整合を解消）
+- [x] 対応言語の拡張：[SupportedLanguage.cs](Assets/Scripts/Localization/SupportedLanguage.cs)を2026年7月24日〜8月2日に東京で開催された「2026 World Lacrosse Women's Championship」参加16カ国に合わせて拡張（日/英/仏/西/独/チェコ/ヘブライ/繁体中国語/フィリピノ）。**ヘブライ語はRTL（右から左）表示のため、TextMeshPro標準ではレイアウトが崩れる**。RTL整形プラグイン導入が別途必要（[Packages/manifest.json](Packages/manifest.json)には未追加）。Haudenosaunee（イロコイ・ネイションズ）は単一の国語コードが存在しないため未対応、英語表示にフォールバック
 - [ ] Unityシーン本体（Boot/Title/TeamSetup含め未作成。上記コントローラーをアタッチする画面が必要）
 - [ ] ドット絵アセット（プレースホルダー無し）
 - [ ] 試合のトップダウン・アクション表現（現状は数値ベースの簡易シミュレーションのみ）
