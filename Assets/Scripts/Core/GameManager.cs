@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using System.Linq;
 using PixelCross.Data;
 using PixelCross.Economy;
+using PixelCross.Gacha;
+using PixelCross.Inventory;
 using PixelCross.Match;
 using PixelCross.SaveLoad;
 using PixelCross.Scouting;
@@ -148,6 +150,37 @@ namespace PixelCross.Core
         {
             Turns.AdvanceWeek();
         }
+
+        public bool TryGachaPullSingleWithTicket(out Item item)
+        {
+            var success = GachaSystem.TryPullSingleWithTicket(PlayerTeam, _rng, out item);
+            if (success) InventorySystem.AddItem(PlayerTeam, item);
+            return success;
+        }
+
+        public bool TryGachaPullTenWithTicket(out List<Item> items)
+        {
+            var success = GachaSystem.TryPullTenWithTicket(PlayerTeam, _rng, out items);
+            if (success) InventorySystem.AddItems(PlayerTeam, items);
+            return success;
+        }
+
+        public bool TryGachaPullSingleWithPremiumCurrency(out Item item)
+        {
+            var success = GachaSystem.TryPullSingleWithPremiumCurrency(PlayerTeam, _rng, out item);
+            if (success) InventorySystem.AddItem(PlayerTeam, item);
+            return success;
+        }
+
+        public bool TryGachaPullTenWithPremiumCurrency(out List<Item> items)
+        {
+            var success = GachaSystem.TryPullTenWithPremiumCurrency(PlayerTeam, _rng, out items);
+            if (success) InventorySystem.AddItems(PlayerTeam, items);
+            return success;
+        }
+
+        public bool UseInventoryItem(PlayerData player, int inventoryIndex) =>
+            InventorySystem.UseItem(PlayerTeam, player, inventoryIndex);
 
         public void SaveGame(string slot = "default")
         {

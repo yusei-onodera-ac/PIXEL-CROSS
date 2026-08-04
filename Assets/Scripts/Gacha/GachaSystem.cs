@@ -19,7 +19,7 @@ namespace PixelCross.Gacha
             (ItemRarity.Legendary, 0.02f)
         };
 
-        public static bool TryPullSingleWithTicket(TeamData team, Random rng, out GachaItem item)
+        public static bool TryPullSingleWithTicket(TeamData team, Random rng, out Item item)
         {
             if (team.GachaTickets < SinglePullTicketCost)
             {
@@ -32,7 +32,7 @@ namespace PixelCross.Gacha
             return true;
         }
 
-        public static bool TryPullTenWithTicket(TeamData team, Random rng, out List<GachaItem> items)
+        public static bool TryPullTenWithTicket(TeamData team, Random rng, out List<Item> items)
         {
             if (team.GachaTickets < TenPullTicketCost)
             {
@@ -45,7 +45,7 @@ namespace PixelCross.Gacha
             return true;
         }
 
-        public static bool TryPullSingleWithPremiumCurrency(TeamData team, Random rng, out GachaItem item)
+        public static bool TryPullSingleWithPremiumCurrency(TeamData team, Random rng, out Item item)
         {
             if (team.PremiumCurrency < SinglePullPremiumCost)
             {
@@ -58,7 +58,7 @@ namespace PixelCross.Gacha
             return true;
         }
 
-        public static bool TryPullTenWithPremiumCurrency(TeamData team, Random rng, out List<GachaItem> items)
+        public static bool TryPullTenWithPremiumCurrency(TeamData team, Random rng, out List<Item> items)
         {
             if (team.PremiumCurrency < TenPullPremiumCost)
             {
@@ -71,7 +71,7 @@ namespace PixelCross.Gacha
             return true;
         }
 
-        private static GachaItem PullSingle(Random rng)
+        private static Item PullSingle(Random rng)
         {
             var roll = rng.NextDouble();
             var cumulative = 0f;
@@ -90,9 +90,9 @@ namespace PixelCross.Gacha
             return BuildItem(rarity, rng);
         }
 
-        private static List<GachaItem> PullTen(Random rng)
+        private static List<Item> PullTen(Random rng)
         {
-            var results = new List<GachaItem>(10);
+            var results = new List<Item>(10);
             for (var i = 0; i < 10; i++)
             {
                 results.Add(PullSingle(rng));
@@ -100,7 +100,7 @@ namespace PixelCross.Gacha
             return results;
         }
 
-        private static GachaItem BuildItem(ItemRarity rarity, Random rng)
+        private static Item BuildItem(ItemRarity rarity, Random rng)
         {
             var itemType = (ItemType)rng.Next(0, 3);
             var multiplier = rarity switch
@@ -112,7 +112,7 @@ namespace PixelCross.Gacha
                 _ => 1f
             };
 
-            return new GachaItem
+            return new Item
             {
                 Name = $"{rarity} {itemType}",
                 Type = itemType,

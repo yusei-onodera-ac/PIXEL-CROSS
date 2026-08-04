@@ -1,6 +1,6 @@
 using System;
 
-namespace PixelCross.Gacha
+namespace PixelCross.Data
 {
     public enum ItemType
     {
@@ -18,7 +18,7 @@ namespace PixelCross.Gacha
     }
 
     [Serializable]
-    public struct GachaItem
+    public struct Item
     {
         public string Name;
         public ItemType Type;

@@ -16,6 +16,7 @@ namespace PixelCross.Data
         public List<PlayerData> HallOfFame = new List<PlayerData>();
         public TacticsSettings Tactics = new TacticsSettings();
         public FacilityLevels Facilities = new FacilityLevels();
+        public List<Item> Inventory = new List<Item>();
 
         public int ScoutTickets;
         public int GachaTickets;
