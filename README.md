@@ -7,6 +7,7 @@
 - C#
 - ビルドターゲット：iOS優先、Android/PC等クロスプラットフォーム対応
 - 主要パッケージ（[Packages/manifest.json](Packages/manifest.json)）：2D Sprite / 2D Pixel Perfect / 2D Animation / TextMeshPro / Unity Localization / Input System
+  - 2D Animation / Input System / Localization は当初Unity 2022.3時代のバージョンを指定しており、Unity 6000.5で `Object.GetInstanceID()` 等の廃止APIによりコンパイルエラーになっていたため、Unity 6対応バージョンに更新済み（2d.animation 12.0.3 / inputsystem 1.19.0 / localization 1.5.9）
 
 ## セットアップ
 1. Unity Hub で本フォルダを「プロジェクトを開く」から追加する。
@@ -29,7 +30,7 @@ Assets/
     Tutorial/     初回チュートリアルのステップ管理
     Localization/ 多言語対応（日/英/仏/西/独/チェコ/繁体中国語/フィリピノ）
     SaveLoad/     セーブデータ定義とJSON保存/読込
-    UI/           起動ロゴ(Splash)・タイトル画面のコントローラー
+    UI/           起動ロゴ(Splash)・タイトル・チーム結成・練習/戦術/試合/スカウト/ガチャ/ショップ/インベントリ/ロースター各画面のコントローラー
   Scenes/         Unityシーン（未作成・要追加。下記「Boot/Titleシーンの作成手順」参照）
   Sprites/        ドット絵素材（Players / UI / Field）
   Prefabs/        プレハブ
@@ -52,7 +53,9 @@ company/logs/     社内AI組織の作業ログ
 - [x] アイテムショップ：[ItemShopSystem.cs](Assets/Scripts/Inventory/ItemShopSystem.cs)（固定カタログ3種を基本硬貨で購入、インベントリに自動格納）。価格は仮の数値
 - [x] TutorialManagerの統合：GameManagerが生の`TutorialStep`ではなく`TutorialManager`本体を保持するよう修正（イベント発火のロジックが死んでいた不整合を解消）
 - [x] 対応言語の拡張：[SupportedLanguage.cs](Assets/Scripts/Localization/SupportedLanguage.cs)を2026年7月24日〜8月2日に東京で開催された「2026 World Lacrosse Women's Championship」参加16カ国に合わせて拡張（日/英/仏/西/独/チェコ/繁体中国語/フィリピノ）。イスラエル（ヘブライ語）はRTL対応の手間を避けるため社長判断で対象外。Haudenosaunee（イロコイ・ネイションズ）は単一の国語コードが存在しないため未対応。いずれも英語表示にフォールバック
-- [ ] Unityシーン本体（Boot/Title/TeamSetup含め未作成。上記コントローラーをアタッチする画面が必要）
+- [x] スカウトのGameManager統合：ScoutSystemがGameManagerから未接続だった不整合を修正（`TryScoutRecruit`で成功時にロースターへ自動追加）
+- [x] ゲームプレイ各画面のコントローラー：[PracticeScreenController.cs](Assets/Scripts/UI/PracticeScreenController.cs)（練習）、[TacticsScreenController.cs](Assets/Scripts/UI/TacticsScreenController.cs)（作戦・戦術）、[MatchScreenController.cs](Assets/Scripts/UI/MatchScreenController.cs)（試合/週送り）、[ScoutScreenController.cs](Assets/Scripts/UI/ScoutScreenController.cs)（スカウト）、[GachaScreenController.cs](Assets/Scripts/UI/GachaScreenController.cs)（ガチャ）、[ShopScreenController.cs](Assets/Scripts/UI/ShopScreenController.cs)（ショップ）、[InventoryScreenController.cs](Assets/Scripts/UI/InventoryScreenController.cs)（インベントリ）、[RosterScreenController.cs](Assets/Scripts/UI/RosterScreenController.cs)（ロースター一覧）。実行時にリストを生成する共通部品として[ActionRowView.cs](Assets/Scripts/UI/ActionRowView.cs)を使用（後述の「Gameplay画面の組み方」参照）
+- [ ] Unityシーン本体（Boot/Title/TeamSetup/Gameplay含め未作成。上記コントローラーをアタッチする画面が必要）
 - [ ] ドット絵アセット（プレースホルダー無し）
 - [ ] 試合のトップダウン・アクション表現（現状は数値ベースの簡易シミュレーションのみ）
 - [ ] 課金（IAP）実装本体（上位硬貨の購入導線）
@@ -80,6 +83,31 @@ company/logs/     社内AI組織の作業ログ
 6. `SplashScreenController`のInspectorで遷移先シーン名（デフォルト`Title`）とフェード秒数を確認・調整。
 
 ※「設定」の遷移先（`Settings`シーン）と、決定後の遷移先`Gameplay`シーンはまだ存在しません。それぞれのシーンを作るまでは押しても何も起きない/エラーになるので想定内です。
+
+## Gameplay画面の組み方（練習/戦術/試合/スカウト/ガチャ/ショップ/インベントリ/ロースター）
+
+これらの画面は「リストを実行時に生成する」共通パターンを使っています。まず以下の**プレハブを1つ**作れば、全画面で使い回せます。
+
+1. Canvas上にGameObjectを作り、TMP_Text（ラベル）とButton（＋その中にTMP_Text）を子として配置。
+2. ルートに[ActionRowView.cs](Assets/Scripts/UI/ActionRowView.cs)をアタッチし、Inspectorで`label`にラベルのTMP_Text、`actionButton`にButton、`actionButtonLabel`にButton内のTMP_Textを割り当てる。
+3. これを`Assets/Prefabs/ActionRow.prefab`として保存。
+
+各コントローラーは空のGameObjectにアタッチし、Inspectorで以下を割り当てます（`Transform`はリストを並べる親、通常は`Vertical Layout Group`を付けたPanel）。
+
+| コントローラー | 主な割り当て |
+|---|---|
+| [PracticeScreenController.cs](Assets/Scripts/UI/PracticeScreenController.cs) | 選手リスト用Transform/ActionRowプレハブ、選択中ラベル、結果ラベル、練習メニュー4種のButton |
+| [TacticsScreenController.cs](Assets/Scripts/UI/TacticsScreenController.cs) | 攻撃/守備方針用TMP_Dropdown×2、オート切替用Toggle |
+| [MatchScreenController.cs](Assets/Scripts/UI/MatchScreenController.cs) | 週表示ラベル、試合情報ラベル、結果ラベル、実行ボタンとそのラベル |
+| [ScoutScreenController.cs](Assets/Scripts/UI/ScoutScreenController.cs) | チケット枚数ラベル、選手名入力用TMP_InputField、スカウトボタン、結果ラベル |
+| [GachaScreenController.cs](Assets/Scripts/UI/GachaScreenController.cs) | 通貨表示ラベル、結果ラベル、単発/10連×チケット/上位硬貨のButton計4個 |
+| [ShopScreenController.cs](Assets/Scripts/UI/ShopScreenController.cs) | カタログリスト用Transform/ActionRowプレハブ、通貨ラベル、結果ラベル |
+| [InventoryScreenController.cs](Assets/Scripts/UI/InventoryScreenController.cs) | 選手リストとアイテムリスト、それぞれ用のTransform/ActionRowプレハブ、選択中ラベル、結果ラベル |
+| [RosterScreenController.cs](Assets/Scripts/UI/RosterScreenController.cs) | ロースターリスト用Transform/ActionRowプレハブ（読み取り専用、ボタンは常に非活性） |
+
+## コンパイルエラーが出た場合
+
+「プロジェクトはコンパイルエラーを含んでいます」と表示された場合、原因が自作スクリプトとは限りません。実際に一度発生したのは、`Packages/manifest.json`に指定していた2D Animation/Input System/Localizationのバージョンが古く（Unity 2022.3時代のもの）、Unity 6000.5では`Object.GetInstanceID()`等が廃止APIとしてエラー扱いになるためでした（パッケージ側のコードなので自作スクリプトの問題ではない）。Console上でエラーの発生元パスが`Library\PackageCache\...`から始まっている場合は、その`com.unity.xxx@ハッシュ`部分がどのパッケージかを見て、`Packages/manifest.json`のバージョンを最新に上げると解決します。
 
 ## 注意
 - 本フォルダは空のGitHubリポジトリ (`https://github.com/yusei-onodera-ac/PIXEL-CROSS.git`) に対応する雛形です。

@@ -185,6 +185,19 @@ namespace PixelCross.Core
         public bool TryPurchaseShopItem(int catalogIndex, out Item purchasedItem) =>
             ItemShopSystem.TryPurchase(PlayerTeam, catalogIndex, out purchasedItem);
 
+        public bool IsScoutingWindowOpen => Turns.IsScoutingWindowOpen;
+
+        public ScoutSystem.ScoutResult TryScoutRecruit(string prospectName)
+        {
+            var result = ScoutSystem.TryScout(PlayerTeam, prospectName, _rng);
+            if (result.Success)
+            {
+                result.Recruit.JoinYear = Turns.CurrentYear;
+                PlayerTeam.Roster.Add(result.Recruit);
+            }
+            return result;
+        }
+
         public void SaveGame(string slot = "default")
         {
             var data = new GameSaveData
